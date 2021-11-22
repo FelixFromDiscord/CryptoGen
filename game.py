@@ -2,39 +2,41 @@ from colorama import Fore, Back, Style, init
 import util
 import configparser
 import os.path
+import requests
 init()
 
-spaces = " "*26
-
-config = configparser.ConfigParser()
+cfg = configparser.ConfigParser()
 if os.path.isfile("save.ini"):
-	config.read("save.ini")
+	cfg.read("save.ini")
 else:
-	open("save.ini", 'a').close()
+	req = requests.get("https://raw.githubusercontent.com/FelixFromDiscord/CryptoGen/main/util/templ.ini").text
+	f = open("save.ini", "w")
+	f.write(req)
+	f.close()
 	print(f"{Fore.RED}Please relaunch the game, save file was lost but recreated.")
 	exit()
 
-def mmenu():
-	print(f"""
-	{Fore.YELLOW}{spaces}CryptoGen v1.0.1
-
-	{Fore.GREEN}{spaces}1. New Game
-	{Fore.BLUE}{spaces}2. Continue
-	{Fore.RED}{spaces}3. Exit
-	""")
-	choice = util.cinp()
-	if choice == None or len(choice.replace(" ", "")) == 0:
-		mmenu()
-	elif choice == "1":
-		gamestart()
-	elif choice == "3":
-		print("\n"*100 + " "*34 + Fore.RED + "CryptOS v6.9" + "\n" + " "*34 + Fore.BLUE + "Turning off...")
-		exit()
-	else:
-		mmenu()
+#####
+username = cfg["Character"]["Name"]
+#####
 
 def gamestart():
-	print(f"{Fore.RED}{Back.WHITE}TEMPLATE")
+	name = util.cinp("Enter your name # ")
+	if name.__contains__(" "):
+		print(f"{Fore.RED}Names can not contain spaces!\n")
+		gamestart()
+	elif len(name) > 10:
+		print(f"{Fore.RED}Name is too long, try again! (max 10 characters)\n")
+		gamestart()
+	elif len(name) < 3:
+		print(f"{Fore.RED}Are you serious? (min 3 characters)\n")
+	elif len(name) == 0:
+		gamestart()
+	else: 
+		print("")
+		username = name
+		cfg["Character"]["Name"] = name
+		gamemain()
 
-if __name__ == "__main__":
-	mmenu()
+def gamemain():
+	util.cprt(username, user)
